@@ -362,6 +362,92 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
+export interface ApiPlatformPlatform extends Schema.CollectionType {
+  collectionName: 'platforms';
+  info: {
+    singularName: 'platform';
+    pluralName: 'platforms';
+    displayName: 'Platform';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Required & Attribute.Unique;
+    supported: Attribute.Boolean &
+      Attribute.Required &
+      Attribute.DefaultTo<true>;
+    company: Attribute.Enumeration<['Sony', 'Nintendo', 'Microsoft', 'SNK']>;
+    lunch: Attribute.Date;
+    videogames: Attribute.Relation<
+      'api::platform.platform',
+      'manyToMany',
+      'api::videogame.videogame'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::platform.platform',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::platform.platform',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiVideogameVideogame extends Schema.CollectionType {
+  collectionName: 'videogames';
+  info: {
+    singularName: 'videogame';
+    pluralName: 'videogames';
+    displayName: 'Videogame';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        minLength: 1;
+        maxLength: 150;
+      }>;
+    lunch: Attribute.Date;
+    image: Attribute.Media;
+    slug: Attribute.UID<'api::videogame.videogame', 'title'>;
+    platforms: Attribute.Relation<
+      'api::videogame.videogame',
+      'manyToMany',
+      'api::platform.platform'
+    >;
+    description: Attribute.RichText & Attribute.Required;
+    descriptions: Attribute.RichText & Attribute.Required;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::videogame.videogame',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::videogame.videogame',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -783,92 +869,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
-export interface ApiPlatformPlatform extends Schema.CollectionType {
-  collectionName: 'platforms';
-  info: {
-    singularName: 'platform';
-    pluralName: 'platforms';
-    displayName: 'Platform';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    name: Attribute.String & Attribute.Required & Attribute.Unique;
-    supported: Attribute.Boolean &
-      Attribute.Required &
-      Attribute.DefaultTo<true>;
-    company: Attribute.Enumeration<['Sony', 'Nintendo', 'Microsoft', 'SNK']>;
-    lunch: Attribute.Date;
-    videogames: Attribute.Relation<
-      'api::platform.platform',
-      'manyToMany',
-      'api::videogame.videogame'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::platform.platform',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::platform.platform',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiVideogameVideogame extends Schema.CollectionType {
-  collectionName: 'videogames';
-  info: {
-    singularName: 'videogame';
-    pluralName: 'videogames';
-    displayName: 'Videogame';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    title: Attribute.String &
-      Attribute.Required &
-      Attribute.SetMinMaxLength<{
-        minLength: 1;
-        maxLength: 150;
-      }>;
-    lunch: Attribute.Date;
-    image: Attribute.Media;
-    slug: Attribute.UID<'api::videogame.videogame', 'title'>;
-    platforms: Attribute.Relation<
-      'api::videogame.videogame',
-      'manyToMany',
-      'api::platform.platform'
-    >;
-    description: Attribute.RichText & Attribute.Required;
-    descriptions: Attribute.RichText & Attribute.Required;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::videogame.videogame',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::videogame.videogame',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -879,6 +879,8 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::platform.platform': ApiPlatformPlatform;
+      'api::videogame.videogame': ApiVideogameVideogame;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;
@@ -887,8 +889,6 @@ declare module '@strapi/types' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'api::platform.platform': ApiPlatformPlatform;
-      'api::videogame.videogame': ApiVideogameVideogame;
     }
   }
 }
